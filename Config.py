@@ -11,6 +11,10 @@ class Collisiontypes:
     CHECKPOINT = 4
 
 
+MAX_LAPS = 5
+AI_TRAINER_MODE = False
+
+
 class Screen:
     WIDTH = 920
     HEIGHT = 700
@@ -18,12 +22,14 @@ class Screen:
 
 
 class Specifications:
-    BOATS = [[0.5, "yacht_1.png", 150, 0.01, 0.005],
-             [0.5, "yacht_2.png", 150, 0.01, 0.005],
-             [0.5, "yacht_3.png", 150, 0.01, 0.005],
-             [0.5, "yacht_4.png", 150, 0.01, 0.005],
-             [0.5, "yacht_5.png", 150, 0.01, 0.005],
-             [0.5, "yacht_6.png", 150, 0.01, 0.005]]
+    BOATS = [
+        [0.5, "yacht_1.png", 150, 0.01, 0.005],
+        [0.5, "yacht_2.png", 150, 0.01, 0.005],
+        [0.5, "yacht_3.png", 150, 0.01, 0.005],
+        [0.5, "yacht_4.png", 150, 0.01, 0.005],
+        [0.5, "yacht_5.png", 150, 0.01, 0.005],
+        [0.5, "yacht_6.png", 150, 0.01, 0.005],
+    ]
 
 
 class Tracks:
@@ -45,13 +51,16 @@ class Tracks:
             map_generator = MapGenerator(*Tracks.TRACKS1[self])
         return LevelBuilder1((100, 73), map_generator)
 
-    TRACKS1 = [(23, 23, 27, 27, 2, 14),
-               (24, 24, 29, 29, 2, 18),
-               (25, 25, 30, 30, 2, 36),
-               (15, 15, 19, 19, 2, 3)]
+    TRACKS1 = [
+        (23, 23, 27, 27, 2, 14),
+        (24, 24, 29, 29, 2, 18),
+        (25, 25, 30, 30, 2, 36),
+        (15, 15, 19, 19, 2, 3),
+    ]
 
-    TRACKSDEV1 = [(11, 11, 15, 15, 1, 5),
-                  ]
+    TRACKSDEV1 = [
+        (11, 11, 15, 15, 1, 5),
+    ]
 
     def get_trackgenerator2(self: int):
         pass
@@ -59,5 +68,9 @@ class Tracks:
 
     TRACKS2 = []
 
-    TRACKS = [(get_trackgenerator1, 0), (get_trackgenerator1, 1),
-              (get_trackgenerator1, 2), (get_trackgenerator1, 3)]
+    TRACKS = [
+        (get_trackgenerator1, 0),
+        (get_trackgenerator1, 1),
+        (get_trackgenerator1, 2),
+        (get_trackgenerator1, 3),
+    ]

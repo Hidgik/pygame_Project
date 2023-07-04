@@ -34,37 +34,44 @@ class Main:
             BaseBoat(space, radarManager, (Config.Specifications.BOATS[3]), level),
         ]
         controllers = [
-            SimpleController(
-                boats[0], level), AIController(
-                boats[1], level), SimpleController(
-                boats[2], level), KeyboardController(
-                    boats[0], level, pg.K_LEFT, pg.K_RIGHT, pg.K_UP, pg.K_DOWN), ]
+            SimpleController(boats[2], level),
+            AIController(boats[1], level),
+            SimpleController(boats[0], level),
+            KeyboardController(
+                boats[0], level, pg.K_LEFT, pg.K_RIGHT, pg.K_UP, pg.K_DOWN
+            ),
+        ]
 
         radarManager.register_collision_type(Config.Collisiontypes.BOAT)
         radarManager.register_collision_type(Config.Collisiontypes.SHORE)
         radarManager.register_collision_type(Config.Collisiontypes.CHECKPOINT)
 
-        game = Game(
-            space,
-            surface,
-            radarManager,
-            boats,
-            controllers,
-            self.FPS,
-            level,
-            is_debug)
-        exit_code = game.run()
+        for cnt in range(2):
+            for boat in boats:
+                boat.reset()
+            game = Game(
+                space,
+                surface,
+                radarManager,
+                boats,
+                controllers,
+                self.FPS,
+                level,
+                is_debug,
+            )
+            exit_code = game.run()
         pg.quit()
         return exit_code
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     FPS = 60
     DEBUG = False
 
     SIZE = WIGHT, HEIGHT = 920, 700
     app = Main(WIGHT, HEIGHT, FPS)
-
+    Config.MAX_LAPS = 2
+    Config.AI_TRAINER_MODE = True
     code = app.run_game(DEBUG)
     # some actions here
     sys.exit(code)

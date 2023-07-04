@@ -1,8 +1,12 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"}]}}
+
 #!pwsh
 
 rm -r -fo python-env
 rm -r -fo __pycache__
-D:\Python39\python.exe -m venv python-env
+python.exe -m venv python-env
 
 #!pwsh
 

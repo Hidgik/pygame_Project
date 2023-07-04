@@ -24,8 +24,12 @@ class Menu(pg.sprite.Sprite):
         self.rect.y = y
 
     def update(self, *args):
-        if args and args[0].type == pg.MOUSEBUTTONDOWN and \
-                self.rect.collidepoint(args[0].pos) and args[0].button == 1:
+        if (
+            args
+            and args[0].type == pg.MOUSEBUTTONDOWN
+            and self.rect.collidepoint(args[0].pos)
+            and args[0].button == 1
+        ):
             raise MenuError
 
 
@@ -40,15 +44,8 @@ class Game:
     boats: List[BaseBoat]
 
     def __init__(
-            self,
-            space,
-            surface,
-            radarManager,
-            boats,
-            controllers,
-            FPS,
-            level,
-            debug=False):
+        self, space, surface, radarManager, boats, controllers, FPS, level, debug=False
+    ):
         self.space = space
         self.surface = surface
         self.boats = boats
@@ -62,8 +59,7 @@ class Game:
         self.time_delta = 0
 
         self.draw_options = pymunk.pygame_util.DrawOptions(self.surface)
-        self.camera = Camera(
-            level.size, (Config.Screen.WIDTH, Config.Screen.HEIGHT))
+        self.camera = Camera(level.size, (Config.Screen.WIDTH, Config.Screen.HEIGHT))
 
         self.space.gravity = 0, 0
 
@@ -75,14 +71,15 @@ class Game:
         self.max_speed = 0
         self.place = 0
         self.points = 0
-        self.name = ''
+        self.name = ""
 
         self.all_sprites = pg.sprite.Group()
         Menu(
             "menu.png",
             self.screen.get_width() // 2 - 80,
             self.screen.get_height() // 2 + 70,
-            self.all_sprites)
+            self.all_sprites,
+        )
 
     def run(self):
         for boat in self.boats:
@@ -102,25 +99,24 @@ class Game:
         for boat in self.boats:
             infoboat.append(boat.get_info())
         lap = infoboat[0][0]
-        infoboat[0] = infoboat[0] + ('Яхта игрока',)
+        infoboat[0] = infoboat[0] + ("Яхта игрока",)
         for i in range(1, len(infoboat)):
-            infoboat[i] = infoboat[i] + ('Бот',)
+            infoboat[i] = infoboat[i] + ("Бот",)
         self.radarManager.update_sensors()
 
         playerX, playerY = self.boats[0].get_position()
         cxy, wxy, scaling = self.camera.update(
-            playerX, playerY, self.boats[0].get_velocity())
+            playerX, playerY, self.boats[0].get_velocity()
+        )
 
         self.space.step(1 / self.FPS)
         if Config.Screen.DEBUG:
-            self.draw_options.transform = (
-                pymunk.Transform.scaling(scaling)
-                @ pymunk.Transform(tx=-cxy[0], ty=-cxy[1])
-            )
+            self.draw_options.transform = pymunk.Transform.scaling(
+                scaling
+            ) @ pymunk.Transform(tx=-cxy[0], ty=-cxy[1])
 
         cropped_image = self.a.subsurface(cxy[0], cxy[1], wxy[0], wxy[1])
-        cropped_image = pg.transform.scale(
-            cropped_image, self.camera.screen_size)
+        cropped_image = pg.transform.scale(cropped_image, self.camera.screen_size)
         self.screen.blit(cropped_image, (0, 0))
         if Config.Screen.DEBUG:
             self.space.debug_draw(self.draw_options)
@@ -131,7 +127,9 @@ class Game:
         self.render_lap(str(lap), (100, 0))
         self.render_speed(str(int(self.boats[0].get_velocity())), (300, 0))
         self.render_place(infoboat, (600, 0))
-        if lap == 5:
+        if lap == Config.MAX_LAPS:
+            if Config.AI_TRAINER_MODE:
+                return False
             self.finish(self.place)
         if self.boats[0].get_velocity() > self.max_speed:
             self.max_speed = self.boats[0].get_velocity()
@@ -149,74 +147,84 @@ class Game:
 
     def render_fps(self, text, pos):
         font = pg.font.Font(None, 30)
-        render_text = font.render(text + ' FPS', True, pg.Color('green'))
+        render_text = font.render(text + " FPS", True, pg.Color("green"))
         self.screen.blit(render_text, pos)
 
     def render_lap(self, lap, pos):
         font = pg.font.Font(None, 30)
-        render_text = font.render('Lap' + lap + '/4', True, pg.Color('red'))
+        render_text = font.render("Lap" + lap + "/4", True, pg.Color("red"))
         self.screen.blit(render_text, pos)
 
     def render_speed(self, speed, pos):
         font = pg.font.Font(None, 30)
-        render_text = font.render('Speed' + speed, True, pg.Color('red'))
+        render_text = font.render("Speed" + speed, True, pg.Color("red"))
         self.screen.blit(render_text, pos)
 
     def render_place(self, infoboat, pos):
         font = pg.font.Font(None, 30)
         infoboat.sort(key=lambda x: (-x[0], -x[1], x[2]))
         for i in range(len(infoboat)):
-            if infoboat[i][3] == 'Яхта игрока':
+            if infoboat[i][3] == "Яхта игрока":
                 self.place = i + 1
-                render_text = font.render(
-                    'Место' + str(i + 1), True, pg.Color('red'))
+                render_text = font.render("Место" + str(i + 1), True, pg.Color("red"))
                 self.screen.blit(render_text, pos)
 
     def finish(self, place):
         points = {1: 16000, 2: 12000, 3: 8000, 4: 4000}
         a = pg.transform.scale(load_image("finish.png"), (800, 400))
         running = True
-        self.name = ''
+        self.name = ""
         self.points = int(self.max_speed) * 6 + points[place]
         font = pg.font.Font(None, 40)
         while running:
             events = pg.event.get()
             self.screen.blit(
                 a,
-                (self.screen.get_width() //
-                 2 -
-                 400,
-                 self.screen.get_height() //
-                 2 -
-                 200))
+                (
+                    self.screen.get_width() // 2 - 400,
+                    self.screen.get_height() // 2 - 200,
+                ),
+            )
             self.all_sprites.draw(self.screen)
-            render_text = font.render('За место: ' +
-                                      str(points[place]), True, (60, 80, 200))
-            self.screen.blit(render_text,
-                             (self.screen.get_width() // 2 - 150,
-                              self.screen.get_height() // 2 - 90))
             render_text = font.render(
-                'За скорость: ' + str(int(self.max_speed) * 6), True, (60, 80, 200))
-            self.screen.blit(render_text,
-                             (self.screen.get_width() // 2 - 150,
-                              self.screen.get_height() // 2 - 45))
-            render_text = font.render('Итого: ' +
-                                      str(self.points), True, (60, 80, 200))
+                "За место: " + str(points[place]), True, (60, 80, 200)
+            )
             self.screen.blit(
                 render_text,
-                (self.screen.get_width() // 2 - 150,
-                 self.screen.get_height() // 2))
+                (
+                    self.screen.get_width() // 2 - 150,
+                    self.screen.get_height() // 2 - 90,
+                ),
+            )
             render_text = font.render(
-                'Ваше имя: ' + self.name, True, (60, 80, 200))
-            self.screen.blit(render_text,
-                             (self.screen.get_width() // 2 - 150,
-                              self.screen.get_height() // 2 + 45))
+                "За скорость: " + str(int(self.max_speed) * 6), True, (60, 80, 200)
+            )
+            self.screen.blit(
+                render_text,
+                (
+                    self.screen.get_width() // 2 - 150,
+                    self.screen.get_height() // 2 - 45,
+                ),
+            )
+            render_text = font.render("Итого: " + str(self.points), True, (60, 80, 200))
+            self.screen.blit(
+                render_text,
+                (self.screen.get_width() // 2 - 150, self.screen.get_height() // 2),
+            )
+            render_text = font.render("Ваше имя: " + self.name, True, (60, 80, 200))
+            self.screen.blit(
+                render_text,
+                (
+                    self.screen.get_width() // 2 - 150,
+                    self.screen.get_height() // 2 + 45,
+                ),
+            )
             for event in events:
                 self.all_sprites.update(event)
                 if event.type == pg.QUIT:
                     sys.exit()
                 if event.type == pg.KEYDOWN:
-                    if event.unicode == '\x08':
+                    if event.unicode == "\x08":
                         self.name = self.name[:-1]
                     elif len(self.name) < 8:
                         self.name += event.unicode
