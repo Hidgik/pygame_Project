@@ -3,24 +3,43 @@ from typing import Tuple
 from Utills.utils import DelayedUpdate
 
 
+class FixedCamera:
+    def __init__(self, level_size: Tuple[int, int], screen_size: Tuple[int, int]):
+        self.scaling = max(
+            screen_size[0] / level_size[0], screen_size[1] / level_size[1]
+        )
+
+        self.screen_size = screen_size
+        self.wx = screen_size[0] / self.scaling
+        self.wy = screen_size[1] / self.scaling
+
+        self.cx = level_size[0] - self.wx
+        self.cy = level_size[1] - self.wy
+
+    def update(self, x, y, v) -> tuple[tuple[int, int], tuple[float, float], float]:
+        return (
+            (self.cx, self.cy),
+            (self.wx, self.wy),
+            self.scaling,
+        )
+
+
 class Camera:
     screen_size: Tuple[int, int]
     level_size: Tuple[int, int]
 
-    def __init__(
-            self, level_size: Tuple[int, int], screen_size: Tuple[int, int]):
+    def __init__(self, level_size: Tuple[int, int], screen_size: Tuple[int, int]):
         self.screen_size = screen_size
         self.level_size = level_size
         self.min_scale = max(
-            screen_size[0] / level_size[0],
-            screen_size[1] / level_size[1])
+            screen_size[0] / level_size[0], screen_size[1] / level_size[1]
+        )
         self.scalingUpdate = DelayedUpdate(k=0.01)
         self.cameraXUpdate = DelayedUpdate(initial=0, k=0.1)
         self.cameraYUpdate = DelayedUpdate(initial=0, k=0.1)
         self.max_speed = 300
 
-    def update(self, x, y, v) -> tuple[tuple[int,
-                                             int], tuple[float, float], float]:
+    def update(self, x, y, v) -> tuple[tuple[int, int], tuple[float, float], float]:
         (cx, _) = self.cameraXUpdate.update(x)
         (cy, _) = self.cameraYUpdate.update(y)
         if v > self.max_speed:

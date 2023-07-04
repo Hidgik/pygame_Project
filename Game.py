@@ -6,7 +6,6 @@ import pygame as pg
 from typing import List
 
 import Config
-from Boat.Camera import Camera
 from Boat.BaseBoat import BaseBoat
 from Utills.utils import load_image
 
@@ -40,11 +39,19 @@ def init_window():
 
 
 class Game:
-    camera: Camera
     boats: List[BaseBoat]
 
     def __init__(
-        self, space, surface, radarManager, boats, controllers, FPS, level, debug=False
+        self,
+        space,
+        surface,
+        radarManager,
+        boats,
+        controllers,
+        FPS,
+        level,
+        camera,
+        debug=False,
     ):
         self.space = space
         self.surface = surface
@@ -59,7 +66,7 @@ class Game:
         self.time_delta = 0
 
         self.draw_options = pymunk.pygame_util.DrawOptions(self.surface)
-        self.camera = Camera(level.size, (Config.Screen.WIDTH, Config.Screen.HEIGHT))
+        self.camera = camera
 
         self.space.gravity = 0, 0
 

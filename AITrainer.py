@@ -2,6 +2,7 @@ import sys
 
 from Boat.AIController import AIController
 from Boat.BaseBoat import BaseBoat
+from Boat.Camera import Camera, FixedCamera
 from Boat.KeyboardController import KeyboardController
 from Boat.SimpleController import SimpleController
 from Game import Game
@@ -46,6 +47,8 @@ class Main:
         radarManager.register_collision_type(Config.Collisiontypes.SHORE)
         radarManager.register_collision_type(Config.Collisiontypes.CHECKPOINT)
 
+        camera = FixedCamera(level.size, (Config.Screen.WIDTH, Config.Screen.HEIGHT))
+
         for cnt in range(2):
             for boat in boats:
                 boat.reset()
@@ -57,6 +60,7 @@ class Main:
                 controllers,
                 self.FPS,
                 level,
+                camera,
                 is_debug,
             )
             exit_code = game.run()

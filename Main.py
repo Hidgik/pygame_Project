@@ -3,6 +3,7 @@ import pymunk
 import pygame as pg
 
 from random import choice, randrange
+from Boat.Camera import Camera
 
 from Boat.RadarManager import RadarManager
 from Boat.BaseBoat import BaseBoat
@@ -15,6 +16,7 @@ from Config import Tracks
 from database import Records
 from startscreen import Startscreen
 from table_records import Table_records
+import Config
 
 
 class Main:
@@ -27,7 +29,7 @@ class Main:
             pg.font.init()
             start = Startscreen()
             start.start()
-            while start.res[0] == 'records':
+            while start.res[0] == "records":
                 try:
                     table = Table_records()
                     table.start()
@@ -45,31 +47,31 @@ class Main:
             level.build(space)
             c = [0, 1, 2, 3, 4, 5]
             c.remove(start.res[1] - 1)
-            boats = [BaseBoat(space,
-                              radarManager,
-                              (Specifications.BOATS[start.res[1] - 1]),
-                              level),
-                     ]
+            boats = [
+                BaseBoat(
+                    space, radarManager, (Specifications.BOATS[start.res[1] - 1]), level
+                ),
+            ]
             for i in range(4):
                 a = choice(c)
                 boats.append(
-                    BaseBoat(
-                        space,
-                        radarManager,
-                        (Specifications.BOATS[a]),
-                        level))
+                    BaseBoat(space, radarManager, (Specifications.BOATS[a]), level)
+                )
                 c.remove(a)
             controllers = [
-                SimpleController(
-                    boats[1], level), SimpleController(
-                    boats[2], level), SimpleController(
-                    boats[3], level), SimpleController(
-                    boats[4], level), KeyboardController(
-                        boats[0], level, pg.K_LEFT, pg.K_RIGHT, pg.K_UP, pg.K_DOWN), ]
+                SimpleController(boats[1], level),
+                SimpleController(boats[2], level),
+                SimpleController(boats[3], level),
+                SimpleController(boats[4], level),
+                KeyboardController(
+                    boats[0], level, pg.K_LEFT, pg.K_RIGHT, pg.K_UP, pg.K_DOWN
+                ),
+            ]
 
             radarManager.register_collision_type(Collisiontypes.BOAT)
             radarManager.register_collision_type(Collisiontypes.SHORE)
             radarManager.register_collision_type(Collisiontypes.CHECKPOINT)
+            camera = Camera(level.size, (Config.Screen.WIDTH, Config.Screen.HEIGHT))
             try:
                 game = Game(
                     space,
@@ -79,7 +81,9 @@ class Main:
                     controllers,
                     self.FPS,
                     level,
-                    is_debug)
+                    camera,
+                    is_debug,
+                )
                 exit_code = game.run()
             except MenuError:
                 pass
@@ -89,19 +93,24 @@ class Main:
                 return -1
             if game:
                 if not game.name:
-                    yacht = Records.create(name='Гость' + str(randrange(99)),
-                                           yacht=Specifications.BOATS[start.res[1] - 1][1],
-                                           points=game.points, track=start.res[0])
+                    yacht = Records.create(
+                        name="Гость" + str(randrange(99)),
+                        yacht=Specifications.BOATS[start.res[1] - 1][1],
+                        points=game.points,
+                        track=start.res[0],
+                    )
                     yacht.save()
                 else:
-                    yacht = Records.create(name=game.name,
-                                           yacht=Specifications.BOATS[start.res[1] - 1][1],
-                                           points=game.points,
-                                           track=start.res[0])
+                    yacht = Records.create(
+                        name=game.name,
+                        yacht=Specifications.BOATS[start.res[1] - 1][1],
+                        points=game.points,
+                        track=start.res[0],
+                    )
                     yacht.save()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     FPS = 60
     DEBUG = False
 
